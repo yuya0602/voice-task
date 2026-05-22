@@ -90,8 +90,13 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, fileId: audioFileRes.data.id });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Save API Error:", error);
-        return NextResponse.json({ error: "Failed to save data" }, { status: 500 });
+        const message =
+            error?.response?.data?.error?.message ||
+            error?.errors?.[0]?.message ||
+            error?.message ||
+            "Failed to save data";
+        return NextResponse.json({ error: message }, { status: 500 });
     }
 }

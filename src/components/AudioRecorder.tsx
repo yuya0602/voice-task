@@ -110,17 +110,17 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
                 headers: headers
             })
 
-            if (!res.ok) throw new Error('Save failed')
-
-            const result = await res.json()
-            if (result.error) throw new Error(result.error)
+            const result = await res.json().catch(() => ({}))
+            if (!res.ok || result.error) {
+                throw new Error(result.error || `Save failed (HTTP ${res.status})`)
+            }
 
             alert("Task saved successfully!")
             setReviewData(null)
             setAudioBlob(null)
-        } catch (e) {
+        } catch (e: any) {
             console.error(e)
-            alert("Failed to save task. Please check Drive/Sheet configuration.")
+            alert(`保存に失敗しました:\n${e?.message || e}`)
         } finally {
             setIsSaving(false)
         }
