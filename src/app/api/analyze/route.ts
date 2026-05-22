@@ -14,24 +14,24 @@ export async function POST(req: Request) {
         const base64Audio = Buffer.from(arrayBuffer).toString("base64");
 
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-        // Using 'gemini-flash-latest' (1.5 Flash) which is confirmed in your available models list
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
-        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const responseDate = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
 
         const prompt = `
       システムプロンプト: あなたは優秀な社内秘書AIです。提供された音声ファイルを解析し、以下のJSONフォーマットで情報を抽出してください。
 
       抽出項目:
-      date: タスクの期限や実施日（「来週の月曜」などは具体的な日付 YYYY/MM/DD に変換すること。今日の日付：${today}）
-      task_detail: 何をする必要があるか（簡潔かつ具体的に）
-      assignee: 誰が担当するか（音声内で言及がない場合は「未指定」）
-      client_name: どの顧客との話か（全てカタカナで記載すること）
-      full_transcript: 音声の全文書き起こし
+      client_name_kanji: 顧客名（漢字表記。姓と名の間に半角スペースを入れる。例：「中川 紫乃」）
+      client_name_kana: 顧客名（半角カタカナ表記。姓と名の間に半角スペースを入れる。例：「ﾅｶｶﾞﾜ ｼﾉ」）
+      subject: 件名（内容を簡潔に要約した短いタイトル。例：「自動車保険内容確認」）
+      content: 内容（音声の文字起こしをそのまま記入。整形や要約はしない）
 
       制約事項:
       余計な解説は含めず、JSONデータのみを出力してください。
       音声が不明瞭で判断できない項目は null としてください。
+      client_name_kana は必ず半角カタカナ（ｱｲｳｴｵ...）で出力してください。全角カタカナは使わないこと。
       日本語で出力してください。
     `;
 
@@ -49,7 +49,13 @@ export async function POST(req: Request) {
         const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
         const data = JSON.parse(cleanText);
 
-        return NextResponse.json(data);
+        return NextResponse.json({
+            response_date: responseDate,
+            client_name_kanji: data.client_name_kanji || '',
+            client_name_kana: data.client_name_kana || '',
+            subject: data.subject || '',
+            content: data.content || ''
+        });
 
     } catch (error) {
         console.error("Gemini API Error:", error);

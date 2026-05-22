@@ -9,11 +9,11 @@ interface AudioRecorderProps {
 }
 
 interface TaskData {
-    date: string
-    task_detail: string
-    assignee: string
-    client_name: string
-    full_transcript: string
+    response_date: string
+    client_name_kanji: string
+    client_name_kana: string
+    subject: string
+    content: string
 }
 
 export default function AudioRecorder({ userEmail, userName }: AudioRecorderProps) {
@@ -74,11 +74,11 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
             if (data.error) throw new Error(data.error)
 
             setReviewData({
-                date: data.date || '',
-                task_detail: data.task_detail || '',
-                assignee: data.assignee || '未指定',
-                client_name: data.client_name || '',
-                full_transcript: data.full_transcript || ''
+                response_date: data.response_date || '',
+                client_name_kanji: data.client_name_kanji || '',
+                client_name_kana: data.client_name_kana || '',
+                subject: data.subject || '',
+                content: data.content || ''
             })
         } catch (error) {
             console.error("Error processing audio:", error)
@@ -95,10 +95,7 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
         const formData = new FormData()
         formData.append('audio', audioBlob, 'recording.webm')
         formData.append('taskData', JSON.stringify(reviewData))
-        formData.append('reporter', userName || 'Unknown')
-        formData.append('reporterEmail', userEmail || '')
 
-        // We pass the session token via header if available
         const headers: HeadersInit = {}
         // @ts-ignore
         if (session?.accessToken) {
@@ -141,55 +138,78 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
         return (
             <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-8 text-gray-800">
                 <h2 className="text-2xl font-bold mb-6 text-indigo-600 flex items-center gap-2">
-                    <Edit2 /> Review Extracted Task
+                    <Edit2 /> 内容を確認
                 </h2>
 
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">日付 (Date)</label>
+                        <label className="block text-sm font-medium text-gray-700">対応日</label>
                         <input
                             type="text"
-                            value={reviewData.date}
-                            onChange={e => setReviewData({ ...reviewData, date: e.target.value })}
+                            value={reviewData.response_date}
+                            onChange={e => setReviewData({ ...reviewData, response_date: e.target.value })}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">顧客名 (Client)</label>
+                        <label className="block text-sm font-medium text-gray-700">顧客名（漢字）</label>
                         <input
                             type="text"
-                            value={reviewData.client_name}
-                            onChange={e => setReviewData({ ...reviewData, client_name: e.target.value })}
+                            value={reviewData.client_name_kanji}
+                            onChange={e => setReviewData({ ...reviewData, client_name_kanji: e.target.value })}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">タスク詳細 (Task Detail)</label>
+                        <label className="block text-sm font-medium text-gray-700">顧客名（カナ・半角）</label>
+                        <input
+                            type="text"
+                            value={reviewData.client_name_kana}
+                            onChange={e => setReviewData({ ...reviewData, client_name_kana: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">担当者</label>
+                        <input
+                            type="text"
+                            value="竹田健介"
+                            disabled
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 text-gray-500 p-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">件名</label>
+                        <input
+                            type="text"
+                            value={reviewData.subject}
+                            onChange={e => setReviewData({ ...reviewData, subject: e.target.value })}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">内容（文字起こし）</label>
                         <textarea
-                            value={reviewData.task_detail}
-                            rows={3}
-                            onChange={e => setReviewData({ ...reviewData, task_detail: e.target.value })}
+                            value={reviewData.content}
+                            rows={6}
+                            onChange={e => setReviewData({ ...reviewData, content: e.target.value })}
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">担当者 (Assignee)</label>
+                        <label className="block text-sm font-medium text-gray-700">対応手段</label>
                         <input
                             type="text"
-                            value={reviewData.assignee}
-                            onChange={e => setReviewData({ ...reviewData, assignee: e.target.value })}
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50 p-2"
+                            value="電話"
+                            disabled
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 text-gray-500 p-2"
                         />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">全文書き起こし (Transcript)</label>
-                        <p className="mt-1 text-sm text-gray-500 bg-gray-100 p-3 rounded-md h-32 overflow-y-auto whitespace-pre-wrap">
-                            {reviewData.full_transcript}
-                        </p>
                     </div>
                 </div>
 
