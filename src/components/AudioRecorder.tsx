@@ -137,9 +137,10 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
     if (reviewData) {
         return (
             <div className="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-8 text-gray-800">
-                <h2 className="text-2xl font-bold mb-6 text-indigo-600 flex items-center gap-2">
+                <h2 className="text-2xl font-bold mb-2 text-indigo-600 flex items-center gap-2">
                     <Edit2 /> 内容を確認
                 </h2>
+                <p className="text-sm text-gray-500 mb-6">タップで編集できます。</p>
 
                 <div className="space-y-4">
                     <div>
@@ -218,7 +219,7 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
                         onClick={() => { setReviewData(null); setAudioBlob(null); }}
                         className="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
                     >
-                        Discard
+                        キャンセル
                     </button>
                     <button
                         onClick={handleSave}
@@ -226,7 +227,7 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
                         className="px-6 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-bold shadow-lg flex items-center gap-2"
                     >
                         {isSaving ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-                        Confirm & Save
+                        保存する
                     </button>
                 </div>
             </div>
@@ -236,8 +237,8 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
     return (
         <div className="flex flex-col items-center justify-center w-full max-w-md mx-auto">
             <div className="mb-8 text-center text-white">
-                <h2 className="text-2xl font-bold">Hello, {userName || 'User'}</h2>
-                <p className="opacity-80">Ready to record new task</p>
+                <h2 className="text-2xl font-bold">こんにちは, {userName || 'User'}</h2>
+                <p className="opacity-80">顧客対応履歴を記録します</p>
             </div>
 
             <button
@@ -260,7 +261,7 @@ export default function AudioRecorder({ userEmail, userName }: AudioRecorderProp
 
             <p className="mt-8 text-xl text-white font-medium">
                 {isProcessing ? 'Processing with Gemini...' :
-                    isRecording ? 'Listening...' : 'Tap to Record'}
+                    isRecording ? 'Listening...' : 'タップで録音を開始します。'}
             </p>
         </div>
     )
